@@ -238,7 +238,20 @@ devcall etherInit(device *devptr)
      * the MAC address to a value of its choosing (such as a random number).  */
     //randomEthAddr(ethptr->devAddress);
     bzero(ethptr->devAddress,6);
-	memcpy(ethptr->devAddress,get_parameter(MBX_TAG_GET_MAC_ADDRESS, 2),6);
+	 memcpy(ethptr->devAddress,get_parameter(MBX_TAG_GET_MAC_ADDRESS, 2),6);
+	
+	 // Compensates for reverse ordering of MAC address
+	 // Our mailbox interface gets the MAC address in the incorrect order
+	 // The indices should be in the following order: 3 : 2 : 1 : 0 : 5 : 4
+	 uchar newDevAddress[6];
+	 newDevAddress[0] = ethptr->devAddress[3];
+	 newDevAddress[1] = ethptr->devAddress[2];
+	 newDevAddress[2] = ethptr->devAddress[1];
+	 newDevAddress[3] = ethptr->devAddress[0];
+	 newDevAddress[4] = ethptr->devAddress[5];
+	 newDevAddress[5] = ethptr->devAddress[4];
+	 memcpy(ethptr->devAddress, newDevAddress, 6);
+
     /* Register this device driver with the USB core and return.  */
     status = usb_register_device_driver(&smsc9512_driver);
     if (status != USB_STATUS_SUCCESS)
