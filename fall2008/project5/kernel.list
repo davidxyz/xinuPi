@@ -1,0 +1,11 @@
+
+build/output.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <main>:
+   0:	e3a00003 	mov	r0, #3
+   4:	e3a01004 	mov	r1, #4
+   8:	e0800001 	add	r0, r0, r1
+   c:	e12fff1e 	bx	lr

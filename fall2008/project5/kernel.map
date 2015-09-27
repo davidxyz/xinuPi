@@ -1,0 +1,31 @@
+
+Discarded input sections
+
+ .bss           0x0000000000000000        0x0 build/main.o
+ .ARM.attributes
+                0x0000000000000000       0x16 build/main.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD build/main.o
+
+.init
+ *(.init)
+
+.text           0x0000000000000000       0x24
+ *(.text)
+ .text          0x0000000000000000       0x24 build/main.o
+                0x0000000000000000                main
+
+.data           0x0000000000000024       0x10
+ *(.data)
+ .data          0x0000000000000024       0x10 build/main.o
+
+/DISCARD/
+ *(*)
+OUTPUT(build/output.elf elf32-littlearm)

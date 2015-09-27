@@ -1,0 +1,94 @@
+#!/usr/bin/expect -f
+
+# Expect script for uploading Embedded Xinu to various mips & arm routers.
+# Brylow 2008, 2009.
+
+set timeout -1
+if {$argc > 1} {
+  puts "$argc, $argv"
+  puts "usage: arm-console [backend]"
+  exit
+}
+
+if {$argc == 1} {
+  set backend $argv
+  set spawned [spawn xinu-console $argv]
+} else {
+  set backend null
+  set spawned [spawn xinu-console]
+}
+expect {
+        "error: connection not available" 
+                { send_user "error: connection not available\r\n"
+                  exit }
+        -re "connection '(.*)', class '(.*)', host '(.*)'\r\n"
+                { set backend $expect_out(1,string)
+                  set class   $expect_out(2,string)
+                  set host    $expect_out(3,string)
+                # send_user "connection $backend, class $class, host $host\r\n"
+                }
+}
+# This trick based on fact that hostname produced by console system
+#  will yield server IP on private network when first two octets are
+#  replaced.
+set ip [exec host $host | awk {{print $NF}} | sed {s/[0-9]\+\.[0-9]\+/192.168/}]
+sleep 1
+send -null 1
+expect "(command-mode) "
+send -- "d"
+expect "file: "
+send -- "xinu.boot\r"
+expect {
+        "download complete\r\n"
+                { }
+        "No such file or directory" 
+                { send_user "No such file: xinu.boot\r\n"
+                  exit }
+}
+sleep 1
+send -- "\r"
+set boot 1
+expect {
+        -timeout 1 "ar7100>" {set boot 0
+                              set router 160nl}
+        -timeout 1 "CFE> "   {set boot 0
+                              set router 54gl}
+		  -timeout 1 "xsh$ "	  {set boot 0
+										set router rpi}
+}
+if {1==$boot} {
+        send -null 1
+        expect "(command-mode)"
+        send -- "p"
+        expect "powered on"
+		  
+        expect {
+                "ar7100>" { set router 160nl }
+                "CFE>"    { set router 54gl  }
+					 "xsh$ "	  { set router rpi	}
+                #-re ".*\r\n"    { send "\003"
+                #                  exp_continue }
+                }
+}
+
+if {"160nl"==$router} {
+         send -- "setenv autostart yes\r"
+         sleep 1
+         expect "ar7100>"
+         send -- "dhcp 0x81800000\r"
+         expect -- "Starting kernel"
+} 
+
+if {"54gl"==$router} {
+         send -- "ifconfig -auto eth0\r"
+         expect "CFE> "
+         send -- "boot -elf $ip:$backend"
+         send -- ".boot\r"
+         expect -- "Starting program"
+}
+
+if {"rpi"==$router} {
+			send -- "kexec -n ETH0 $backend"
+			send -- ".boot\r"
+}
+interact
