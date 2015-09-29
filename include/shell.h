@@ -44,7 +44,7 @@
 
 
 /* Uncomment to kexec on boot and display no banner or shell */
-#define POOL_ENABLED
+//#define POOL_ENABLED
 
 #ifdef POOL_ENABLED
 #	define SHELL_BANNER_ON 0
