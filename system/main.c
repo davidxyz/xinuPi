@@ -25,9 +25,6 @@ thread main(void)
     uint nshells = 0;
 #endif
 
-    /* Print information about the operating system  */
-    print_os_info();
-
     /* Open all ethernet devices */
 #if NETHER
     {
@@ -42,14 +39,21 @@ thread main(void)
             }
         }
     }
-/*
-#if POOL_ENABLED
-	kprintf("kexecing new kernel...");
+
+#endif /* NETHER */
+
+#ifdef POOL_ENABLED /* Used to kexec into new kernel immidately, without printing any banners */
+	kprintf("kexecing new kernel...\r\n\r\n\r\n");
 	char *args[] = {"kexec","-n","ETH0"}; 
 	xsh_kexec(3,args);
-#endif
-*/
-#endif /* NETHER */
+	/* Should never return to here, error if it has */
+	kprintf("ERROR: Did not succesfully kexec\r\n");
+	kprintf("\033[1;5;37;41mThis is NOT the kernel you are looking for!\033[0;39m\r\n");
+	/* Continues to boot into regular xinu */
+#endif /* POOL_ENABLED */
+
+    /* Print information about the operating system  */
+    print_os_info();
 
     /* Set up the first TTY (CONSOLE)  */
 #if defined(CONSOLE) && defined(SERIAL0)

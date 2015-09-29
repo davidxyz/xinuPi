@@ -42,7 +42,15 @@
 #define SHELL_SYNTAXERR  "Syntax error.\n"  /**< syntax error            */
 #define SHELL_CHILDERR   "Cannot create.\n" /**< command error           */
 
-#define SHELL_BANNER_ON  1  /**< turns off intial prints during compilation */ 
+
+/* Uncomment to kexec on boot and display no banner or shell */
+#define POOL_ENABLED
+
+#ifdef POOL_ENABLED
+#	define SHELL_BANNER_ON 0
+#else
+#	define SHELL_BANNER_ON  1  /**< turns off intial prints during compilation */ 
+#endif
 
 /* Shell return constants */
 #define SHELL_OK    0
