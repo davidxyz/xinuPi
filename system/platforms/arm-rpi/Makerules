@@ -14,6 +14,7 @@ S_FILES = ctxsw.S          \
 C_FILES = setupStack.c       \
           bcm2835_power.c    \
           dispatch.c         \
+          jtag_enabler.c    \
           kexec.c            \
           platforminit.c     \
           timer.c            \

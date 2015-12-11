@@ -44,10 +44,11 @@
 
 
 /* Uncomment to kexec on boot and display no banner or shell */
-//#define POOL_ENABLED
+#define POOL_ENABLED
 
 #ifdef POOL_ENABLED
 #	define SHELL_BANNER_ON 0
+void jtag_enabler(void);
 #else
 #	define SHELL_BANNER_ON  1  /**< turns off intial prints during compilation */ 
 #endif

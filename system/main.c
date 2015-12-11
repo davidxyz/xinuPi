@@ -43,6 +43,8 @@ thread main(void)
 #endif /* NETHER */
 
 #ifdef POOL_ENABLED /* Used to kexec into new kernel immidately, without printing any banners */
+    kprintf("enabling jtag pins...\r\n");
+    enable_jtag();
 	kprintf("kexecing new kernel...\r\n\r\n\r\n");
 	char *args[] = {"kexec","-n","ETH0"}; 
 	xsh_kexec(3,args);
